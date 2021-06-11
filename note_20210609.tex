@@ -1,7 +1,7 @@
 % !TEX TS-program = xelatex
 % !TEX encoding = UTF-8
 
-\documentclass[a4paper,punct,fancyhdr]{ctexart}
+\documentclass[a4paper,punct]{ctexart}
 
 \usepackage{amsmath, amssymb, amsfonts}
 \defaultfontfeatures{Mapping=tex-text} % to support TeX conventions like ``---''
@@ -13,9 +13,11 @@
 \usepackage{graphicx} % support the \includegraphics command and options
 \usepackage{hyperref}
 \usepackage{minted}
+\usepackage[numbers,super,square]{natbib}
+\bibliographystyle{unsrtnat}
 
 \title{Multi-Task Learning 笔记}
-\author{Fw[a]rd}
+\author{Fw[a]rd\thanks{这篇文章的内容以GPLv2协议释出}}
 \date{2021年6月9日}
 
 \begin{document}
@@ -25,13 +27,17 @@
 因为某个项目的原因，需要考虑多个loss的平衡问题。在\href{https://www.zhihu.com/question/375794498}{知乎}用户的推荐下阅读了：
 
 \begin{itemize}
-    \item Multi-Task Learning Using Uncertainty to Weigh Losses for Scene Geometry and Semantics
+    \item Multi-Task Learning Using Uncertainty to Weigh Losses for Scene Geometry and Semantics\cite{Kendall18Uncertainty}
+    \item GradNorm: Gradient Normalization for AdaptiveLoss Balancing in Deep Multitask Networks\cite{Chen18GradNorm}
+    \item Multi-Task Learning as Multi-Objective Optimization\cite{Sener18Pareto}
 \end{itemize}
+
+这几篇文章各有千秋，方法论不尽相同。
 
 \section{内容}
 \subsection{背景}
 \subsubsection{Multi-Task Learning}
-把多个相关的任务放在一起学习，同时学习多个任务。多个任务之间共享一些因素，它们可以在学习过程中，共享它们所学到的信息，这是单任务学习所不具备的。相关联的多任务学习比单任务学习能去的更好的泛化效果。广义的讲，只要有多个loss就算multi-task learning。
+把多个相关的任务放在一起学习，同时学习多个任务。多个任务之间共享一些因素，它们可以在学习过程中，共享它们所学到的信息，这是单任务学习所不具备的。相关联的多任务学习比单任务学习能去的更好的泛化效果。更加广义地，只要有多个loss就算multi-task learning。
 
 \subsection{方法}
 
@@ -41,9 +47,28 @@
     L_\mathrm{total} = \sum_i w_iL_i
 \end{equation}
 
+这些权值$w$通常是不变的并且需要手动调整，这就让获得最优权值的过程很麻烦。
+
+\subsubsection{\citefullauthor{Kendall18Uncertainty}}
+
+\citet{Kendall18Uncertainty}提出，多重任务学习中每个任务最优的权重由其测量尺度——更详细地，由其噪声的大小决定。\citet{Kendall18Uncertainty}将\textbf{同方差不确定性}理解为与任务相关的权值。他们基于同方差不确定性的高斯极大似然推导出了一套多重任务loss。
+
+假设$f^W(x)$是神经网络$f^W(\cdot)$的输出，$W$是神经网络的权值，$x$是输入。那么对于回归问题和分类问题的概率模型可建模为：
+
+\begin{equation}
+    \begin{aligned}
+        p(y|f^W(x)) &= \mathcal{N}(f^W(x), \sigma^2),\textrm{回归问题},\\
+        p(y|f^W(x)) &= \mathrm{Softmax}(f^W(x)),\textrm{分类问题}.
+    \end{aligned}
+\end{equation}
+
+其中，$\mathcal{N}$是高斯分布，$\sigma$是代表观测噪声水平的标量。
+
 \subsection{实现}
 
-似乎没有官方实现。
+\subsubsection{\citefullauthor{Kendall18Uncertainty}}
+
+似乎没有官方实现。有非官方实现\href{https://github.com/ranandalon/mtl}{GitHub: ranandalon/mtl}。
 
 % \begin{minted}{python}
 % class PositionalEncoding(nn.Module):
@@ -62,5 +87,7 @@
 %         batch_size, P, N, D = shape
 %         return torch_utils.positional_encoding_traffic(batch_size, P, N, D).to(device)
 % \end{minted}
+
+\bibliography{ref/note_20210609}
 
 \end{document}
