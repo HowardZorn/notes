@@ -47,7 +47,7 @@
     \label{eq:output-likelihood}
     \begin{aligned}
         p(y|f^W(x)) &= \mathcal{N}(f^W(x), \sigma^2) = {\frac {1}{\sigma {\sqrt {2\pi }}}}\;e^{-{\frac {\left(y-f^W(x) \right)^{2}}{2\sigma ^{2}}}}, &\textrm{a.回归问题},\\
-        p(y|f^W(x)) &= \mathrm{Softmax}(f^W(x)), &\textrm{b.分类问题}.
+        p(y|f^W(x)) &= \mathrm{Softmax}(f^W(x)) \xlongequal{\textrm{第i个元素}} \frac{e^{f^W_i(x)}}{\sum_{i} e^{f^W_i(x)}}, &\textrm{b.分类问题}.
     \end{aligned}
 \end{equation}
 
@@ -59,6 +59,15 @@
     \begin{aligned}
         \log p(y|f^W(x)) &\propto - \frac{1}{2\sigma^2}\|y-f^W(x)\|^2 - \log \sigma \\
         &= -\frac{1}{2\sigma^2}\mathcal{L_\mathrm{MSE}}(W) - \log \sigma 
+    \end{aligned}
+\end{equation}
+
+对式~\ref{eq:output-likelihood}.b~进行缩放，然后对$p(y|f^W(x)) = \mathrm{Softmax}(\frac{1}{\sigma^2} f^W(x))$做对数，可得：
+
+\begin{equation}
+    \begin{aligned}
+        \log p(y|f^W(x)) &\xlongequal{\textrm{第i个元素}} \frac{1}{\sigma^2} f^W_i(x) - \log \sum_e \exp\left( \frac{1}{\sigma^2} f^W_e(x)\right) \\
+        &\approx -\frac{1}{\sigma^2}\mathcal{L_\mathrm{Cross Entropy}}(W) - \log \sigma 
     \end{aligned}
 \end{equation}
 

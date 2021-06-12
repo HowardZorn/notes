@@ -1,5 +1,6 @@
 
 \usepackage{amsmath, amssymb, amsfonts}
+\usepackage{extarrows}
 \defaultfontfeatures{Mapping=tex-text} % to support TeX conventions like ``---''
 \usepackage{xunicode} % Unicode support for LaTeX character names (accents, European chars, etc)
 \usepackage{xltxtra} % Extra customizations for XeLaTeX\usepackage{geometry} % See geometry.pdf to learn the layout options. There are lots.
@@ -11,3 +12,7 @@
 \usepackage{minted}
 \usepackage[numbers,super,square]{natbib}
 \bibliographystyle{unsrtnat}
+% 中文句号改为英文句点
+\catcode`\。=\active
+\newcommand{。}{\ifmmode\text{．}\else ．\fi}
+
