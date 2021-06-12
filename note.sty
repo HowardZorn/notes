@@ -1,32 +1,13 @@
-% !TEX TS-program = xelatex
-% !TEX encoding = UTF-8
-
-\documentclass[a4paper,punct,fancyhdr]{ctexart}
 
 \usepackage{amsmath, amssymb, amsfonts}
 \defaultfontfeatures{Mapping=tex-text} % to support TeX conventions like ``---''
 \usepackage{xunicode} % Unicode support for LaTeX character names (accents, European chars, etc)
 \usepackage{xltxtra} % Extra customizations for XeLaTeX\usepackage{geometry} % See geometry.pdf to learn the layout options. There are lots.
-\usepackage{geometry} % See geometry.pdf to learn the layout options. There are lots.
+\usepackage[margin={2.54cm,3.18cm}]{geometry} % See geometry.pdf to learn the layout options. There are lots.
 \geometry{a4paper} % or letterpaper (US) or a5paper or....
 %\usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
 \usepackage{graphicx} % support the \includegraphics command and options
 \usepackage{hyperref}
-
-\title{笔记}
-\author{Ruozhou He}
-\date{\today}
-
-\begin{document}
-    \maketitle
-	
-    哈哈，这是个模板。大家早上好\textasciitilde
-
-    \begin{equation}
-        E=mc^2
-        \label{eq:ein}
-    \end{equation}
-    
-    如式\ref{eq:ein}所示，blablablabla。
-
-\end{document}
+\usepackage{minted}
+\usepackage[numbers,super,square]{natbib}
+\bibliographystyle{unsrtnat}

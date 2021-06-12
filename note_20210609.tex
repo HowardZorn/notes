@@ -2,19 +2,7 @@
 % !TEX encoding = UTF-8
 
 \documentclass[a4paper,punct]{ctexart}
-
-\usepackage{amsmath, amssymb, amsfonts}
-\defaultfontfeatures{Mapping=tex-text} % to support TeX conventions like ``---''
-\usepackage{xunicode} % Unicode support for LaTeX character names (accents, European chars, etc)
-\usepackage{xltxtra} % Extra customizations for XeLaTeX\usepackage{geometry} % See geometry.pdf to learn the layout options. There are lots.
-\usepackage[margin={2.54cm,3.18cm}]{geometry} % See geometry.pdf to learn the layout options. There are lots.
-\geometry{a4paper} % or letterpaper (US) or a5paper or....
-%\usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
-\usepackage{graphicx} % support the \includegraphics command and options
-\usepackage{hyperref}
-\usepackage{minted}
-\usepackage[numbers,super,square]{natbib}
-\bibliographystyle{unsrtnat}
+\usepackage{note}
 
 \title{Multi-Task Learning 笔记}
 \author{Fw[a]rd\thanks{这篇文章的内容以GPLv2协议释出}}
@@ -51,19 +39,28 @@
 
 \subsubsection{\citefullauthor{Kendall18Uncertainty}}
 
-\citet{Kendall18Uncertainty}提出，多重任务学习中每个任务最优的权重由其测量尺度——更详细地，由其噪声的大小决定。\citet{Kendall18Uncertainty}将\textbf{同方差不确定性}理解为与任务相关的权值。他们基于同方差不确定性的高斯极大似然推导出了一套多重任务loss。
+\citet{Kendall18Uncertainty}提出，多重任务学习中每个任务最优的权重由其测量尺度——更详细地，由其噪声的大小决定。他们将\textbf{同方差不确定性}理解为与任务相关的权值，基于同方差不确定性的高斯极大似然推导出了一套多重任务loss。
 
 假设$f^W(x)$是神经网络$f^W(\cdot)$的输出，$W$是神经网络的权值，$x$是输入。那么对于回归问题和分类问题的概率模型可建模为：
 
 \begin{equation}
+    \label{eq:output-likelihood}
     \begin{aligned}
-        p(y|f^W(x)) &= \mathcal{N}(f^W(x), \sigma^2),\textrm{回归问题},\\
-        p(y|f^W(x)) &= \mathrm{Softmax}(f^W(x)),\textrm{分类问题}.
+        p(y|f^W(x)) &= \mathcal{N}(f^W(x), \sigma^2) = {\frac {1}{\sigma {\sqrt {2\pi }}}}\;e^{-{\frac {\left(y-f^W(x) \right)^{2}}{2\sigma ^{2}}}}, &\textrm{a.回归问题},\\
+        p(y|f^W(x)) &= \mathrm{Softmax}(f^W(x)), &\textrm{b.分类问题}.
     \end{aligned}
 \end{equation}
 
 其中，$\mathcal{N}$是高斯分布，$\sigma$是代表观测噪声水平的标量。
 
+对式~\ref{eq:output-likelihood}.a~做对数，可得其对数似然正比于：
+
+\begin{equation}
+    \begin{aligned}
+        \log p(y|f^W(x)) &\propto - \frac{1}{2\sigma^2}\|y-f^W(x)\|^2 - \log \sigma \\
+        &= -\frac{1}{2\sigma^2}\mathcal{L_\mathrm{MSE}}(W) - \log \sigma 
+    \end{aligned}
+\end{equation}
 
 \subsection{实现}
 
