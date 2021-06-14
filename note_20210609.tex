@@ -25,16 +25,14 @@
 \section{内容}
 \subsection{背景}
 \subsubsection{Multi-Task Learning}
-把多个相关的任务放在一起学习，同时学习多个任务。多个任务之间共享一些因素，它们可以在学习过程中，共享它们所学到的信息，这是单任务学习所不具备的。相关联的多任务学习比单任务学习能去的更好的泛化效果。更加广义地，只要有多个loss就算multi-task learning。
+即把多个相关的任务放在一起学习。多个任务之间共享一些参数，它们可以在学习过程中共享它们所学到的信息，这是单任务学习所不具备的。相关联的多任务学习比单任务学习能去的更好的泛化效果。更加广义地，只要有多个loss就算multi-task learning。
 
 \subsection{方法}
 
 之前多重任务学习问题大多采用多个loss的加权和作为整个任务的loss：
-
 \begin{equation}
-    L_\mathrm{total} = \sum_i w_iL_i
+    L_\mathrm{total} = \sum_i w_iL_i.
 \end{equation}
-
 这些权值$w$通常是不变的并且需要手动调整，这就让获得最优权值的过程很麻烦。
 
 \subsubsection{\citefullauthor{Kendall18Uncertainty}}
@@ -42,34 +40,66 @@
 \citet{Kendall18Uncertainty}提出，多重任务学习中每个任务最优的权重由其测量尺度——更详细地，由其噪声的大小决定。他们将\textbf{同方差不确定性}理解为与任务相关的权值，基于同方差不确定性的高斯极大似然推导出了一套多重任务loss。
 
 假设$f^W(x)$是神经网络$f^W(\cdot)$的输出，$W$是神经网络的权值，$x$是输入。那么对于回归问题和分类问题的概率模型可建模为：
-
 \begin{equation}
     \label{eq:output-likelihood}
     \begin{aligned}
         p(y|f^W(x)) &= \mathcal{N}(f^W(x), \sigma^2) = {\frac {1}{\sigma {\sqrt {2\pi }}}}\;e^{-{\frac {\left(y-f^W(x) \right)^{2}}{2\sigma ^{2}}}}, &\textrm{a.回归问题},\\
-        p(y|f^W(x)) &= \mathrm{Softmax}(f^W(x)) \xlongequal{\textrm{第i个元素}} \frac{e^{f^W_i(x)}}{\sum_{i} e^{f^W_i(x)}}, &\textrm{b.分类问题}.
+        p(y|f^W(x)) &= \mathrm{Softmax}(f^W(x)) \xlongequal{\textrm{第i个元素}} \frac{e^{f^W_i(x)}}{\sum_{i} e^{f^W_i(x)}}, &\textrm{b.分类问题},
     \end{aligned}
 \end{equation}
-
 其中，$\mathcal{N}$是高斯分布，$\sigma$是代表观测噪声水平的标量。
 
 对式~\ref{eq:output-likelihood}.a~做对数，可得其对数似然正比于：
-
 \begin{equation}
+    \label{eq:回归问题公式}
     \begin{aligned}
         \log p(y|f^W(x)) &\propto - \frac{1}{2\sigma^2}\|y-f^W(x)\|^2 - \log \sigma \\
-        &= -\frac{1}{2\sigma^2}\mathcal{L_\mathrm{MSE}}(W) - \log \sigma 
+        &= -\frac{1}{2\sigma^2}\mathcal{L_\mathrm{MSE}}(W) - \log \sigma.
     \end{aligned}
 \end{equation}
 
 对式~\ref{eq:output-likelihood}.b~进行缩放，然后对$p(y|f^W(x)) = \mathrm{Softmax}(\frac{1}{\sigma^2} f^W(x))$\footnote{可以认为是\href{https://zh.wikipedia.org/wiki/玻尔兹曼分布}{玻尔兹曼分布}}做对数，可得：
+\begin{equation}
+    \log p(y|f^W(x)) \xlongequal{\textrm{第i个元素}} \frac{1}{\sigma^2} f^W_i(x) - \log \sum_e \exp\left( \frac{1}{\sigma^2} f^W_e(x)\right).
+\end{equation}
 
+然后可推对于分类问题不进行缩放的对数似然函数（不要问我为什么，反复看了论文数次没有看懂……）：% TODO 搞懂公式推导过程……
+\begin{equation}
+    \label{eq:分类问题公式}
+    \log p(y|f^W(x)) \approx -\frac{1}{\sigma^2}\mathcal{L_\mathrm{Cross Entropy}}(W) - \log \sigma.
+\end{equation}
+
+对于\emph{多}个任务的多个输出，其极大似然及对数似然可以表示为：
 \begin{equation}
     \begin{aligned}
-        \log p(y|f^W(x)) &\xlongequal{\textrm{第i个元素}} \frac{1}{\sigma^2} f^W_i(x) - \log \sum_e \exp\left( \frac{1}{\sigma^2} f^W_e(x)\right) \\
-        &\approx -\frac{1}{\sigma^2}\mathcal{L_\mathrm{Cross Entropy}}(W) - \log \sigma 
+        p(y_1, \ldots, y_k|f^W(x)) &= p(y_1 | f^W(x)) \cdots p(y_k | f^W(x)), \\
+        &\downarrow \\
+        \log p(y_1, \ldots, y_k|f^W(x)) &= \log p(y_1 | f^W(x)) + \cdots + \log p(y_k | f^W(x)).
     \end{aligned}
 \end{equation}
+
+因为loss追求最小化，所以给多个任务的对数似然添加负号之后就是我们要的多重任务loss函数$\mathcal{L}(\cdot)$，可以使用式~\ref{eq:回归问题公式}~和式~\ref{eq:分类问题公式}的结果对其中的单个任务的输出的对数似然进行替换。
+\begin{equation}
+    \mathcal{L}(W) = - \log p(y_1, \ldots, y_k|f^W(x)) = - (\log p(y_1 | f^W(x)) + \cdots + \log p(y_k | f^W(x))).
+\end{equation}
+在这个多重任务loss中，代表噪声的$\sigma$将作为可学习的参数。因为在$\log(\cdot)$下$\sigma$可能取到非法的值，所以我们重新定义一个可学习参数$s=\log \sigma^2$代替式子中的$\sigma$。
+
+\paragraph{例} 假设有一个多重任务，其中一个是回归问题（$\mathcal{L}_1$是MSE），一个是分类问题（$\mathcal{L}_2$是交叉熵）。那么它总的loss是：
+\begin{equation}
+    \begin{aligned}
+        \mathcal{L}(W) &= - \log p(y_1|f^W(x)) - \log p(y_2|f^W(x)) \\
+         &= \frac{1}{2{\sigma_1}^2} \mathcal{L}_1(W) + \frac{1}{{\sigma_2}^2} \mathcal{L}_2(W) + \log \sigma_1\sigma_2 \\
+         &\xlongequal{s_i =\log {\sigma_i}^2} \frac{1}{2{e}^{s_1}} \mathcal{L}_1(W) + \frac{1}{{e}^{s_2}} \mathcal{L}_2(W) + \frac{s_1 + s_2}{2}.
+    \end{aligned}
+\end{equation}
+
+\subsubsection{\citefullauthor{Chen18GradNorm}}
+
+\citet{Chen18GradNorm}提出，
+
+\subsubsection{\citefullauthor{Sener18Pareto}}
+
+\citet{Sener18Pareto}提出，
 
 \subsection{实现}
 
@@ -94,6 +124,11 @@
 %         batch_size, P, N, D = shape
 %         return torch_utils.positional_encoding_traffic(batch_size, P, N, D).to(device)
 % \end{minted}
+
+
+\section{结果与观感}
+
+
 
 \bibliography{ref/note_20210609}
 
