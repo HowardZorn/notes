@@ -105,25 +105,35 @@
 
 \subsubsection{\citefullauthor{Kendall18Uncertainty}}
 
-似乎没有官方实现。有非官方实现（GitHub: \href{https://github.com/ranandalon/mtl}{ranandalon/mtl}）。
+官方实现是一个空的仓库，很有意思的是把issue给关了（GitHub: \href{https://github.com/dyz-zju/multitaskvision}{dyz-zju/multitaskvision}）。有非官方实现（GitHub: \href{https://github.com/ranandalon/mtl}{ranandalon/mtl}, \href{https://github.com/Mikoto10032/AutomaticWeightedLoss}{Mikoto\-10032/Automatic\-Weighted\-Loss}）。
 
-% \begin{minted}{python}
-% class PositionalEncoding(nn.Module):
-%     '''
-%     Positional Encoding
-%     '''
-%     def __init__(self):
-%         super(PositionalEncoding, self).__init__()
+\begin{minted}{python}
+import torch
+import torch.nn as nn
 
-%     def forward(self, shape, device):
-%         '''
-%         shape: Size(batch_size, P, N, D)
-%         device: tensor's device type
-%         return: [batch_size, P, N, D]
-%         '''
-%         batch_size, P, N, D = shape
-%         return torch_utils.positional_encoding_traffic(batch_size, P, N, D).to(device)
-% \end{minted}
+class AutomaticWeightedLoss(nn.Module):
+    """automatically weighted multi-task loss
+    Params：
+        num: int，the number of loss
+        x: multi-task loss
+    Examples：
+        loss1=1
+        loss2=2
+        awl = AutomaticWeightedLoss(2)
+        loss_sum = awl(loss1, loss2)
+    """
+    def __init__(self, num=2):
+        super(AutomaticWeightedLoss, self).__init__()
+        params = torch.ones(num, requires_grad=True)
+        self.params = torch.nn.Parameter(params)
+
+    def forward(self, *x):
+        loss_sum = 0
+        for i, loss in enumerate(x):
+            loss_sum += 0.5 / (self.params[i] ** 2) * loss + \
+                torch.log(1 + self.params[i] ** 2)
+        return loss_sum
+\end{minted}
 
 
 \section{结果与观感}
