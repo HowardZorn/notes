@@ -1,18 +1,20 @@
-
+% math
 \usepackage{amsmath, amssymb, amsfonts}
 \usepackage{extarrows}
+\usepackage{nicefrac}  % 分数更好看
+
 \defaultfontfeatures{Mapping=tex-text} % to support TeX conventions like ``---''
 \usepackage{xunicode} % Unicode support for LaTeX character names (accents, European chars, etc)
+\usepackage{booktabs} % professional-quality tables
 \usepackage{xltxtra} % Extra customizations for XeLaTeX\usepackage{geometry} % See geometry.pdf to learn the layout options. There are lots.
 \usepackage[margin={2.54cm,3.18cm}]{geometry} % See geometry.pdf to learn the layout options. There are lots.
 \geometry{a4paper} % or letterpaper (US) or a5paper or....
 %\usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
 \usepackage{graphicx} % support the \includegraphics command and options
-\usepackage{hyperref}
-\usepackage{minted}
+\usepackage{hyperref} % support the \href command
+\usepackage{minted} % to support the code showing
 \usepackage[numbers,super,square]{natbib}
 \bibliographystyle{unsrtnat}
 % 中文句号改为英文句点
 \catcode`\。=\active
 \newcommand{。}{\ifmmode\text{．}\else ．\fi}
-

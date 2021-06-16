@@ -1,7 +1,7 @@
 % !TEX TS-program = xelatex
 % !TEX encoding = UTF-8
 
-\documentclass[a4paper,punct]{ctexart}
+\documentclass{ctexart}
 \usepackage{note}
 
 \title{Multi-Task Learning 笔记}
@@ -105,9 +105,12 @@
 
 \subsubsection{\citefullauthor{Kendall18Uncertainty}}
 
-官方实现是一个空的仓库，很有意思的是把issue给关了（GitHub: \href{https://github.com/dyz-zju/multitaskvision}{dyz-zju/multitaskvision}）。有非官方实现（GitHub: \href{https://github.com/ranandalon/mtl}{ranandalon/mtl}, \href{https://github.com/Mikoto10032/AutomaticWeightedLoss}{Mikoto\-10032/Automatic\-Weighted\-Loss}）。
+官方实现是一个空的仓库，很有意思……（GitHub: \href{https://github.com/dyz-zju/multitaskvision}{dyz-zju/multitaskvision}，该地址疑为fork过后的）有非官方实现（GitHub: \href{https://github.com/ranandalon/mtl}{ranandalon/mtl}, \href{https://github.com/Mikoto10032/AutomaticWeightedLoss}{Mikoto\-10032/Automatic\-Weighted\-Loss}）。
 
-\begin{minted}{python}
+\begin{minted}[
+    frame=lines,
+    linenos
+]{python}
 import torch
 import torch.nn as nn
 
