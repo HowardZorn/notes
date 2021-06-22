@@ -15,6 +15,9 @@
 \usepackage{minted} % to support the code showing
 \usepackage[numbers,super,square]{natbib}
 \bibliographystyle{unsrtnat}
+\usepackage{xeCJKfntef}
 % 中文句号改为英文句点
 \catcode`\。=\active
 \newcommand{。}{\ifmmode\text{．}\else ．\fi}
+% 中文强调用着重号，总之不用楷体……
+\renewcommand{\emph}[1]{\CJKunderdot{#1}}
