@@ -95,9 +95,12 @@
 
 \subsubsection{\citefullauthor{Chen18GradNorm}}
 
-\citet{Chen18GradNorm}提出，任务间的不平衡的表现为反向传播时\emph{梯度的不平衡}，最终影响训练结果。比方说一个占主导地位的任务，其主导地位表现为反向传播时具有相对其它任务而言较大的梯度。他们通过调整每个任务的损失函数的反向传播梯度的幅度，使多个任务在相似的\emph{速率}下训练。
+\citet{Chen18GradNorm}提出，任务间的不平衡的表现为反向传播时\emph{梯度的不平衡}，最终影响训练结果。比方说有一个占主导地位的任务，其主导地位表现为反向传播时具有相对其它任务而言较大的梯度。他们通过调整每个任务的损失函数的反向传播梯度的幅度，使多个任务在相似的\emph{速率}下训练。
 
-
+这篇文章的目标是找出在某一步训练$t$时，对应某个任务$i$的最佳权值$w_i(t)$，即最终的多重任务loss $L_\mathrm{total}(\cdot)$为：
+\begin{equation}
+    L_\mathrm{total}(W;t) = \sum_i w_i(t) L_i
+\end{equation}
 
 \subsubsection{\citefullauthor{Sener18Pareto}}
 
@@ -140,6 +143,13 @@ class AutomaticWeightedLoss(nn.Module):
         return loss_sum
 \end{minted}
 
+\subsection{\citefullauthor{Chen18GradNorm}}
+
+没有找到官方实现。
+
+\subsection{\citefullauthor{Sener18Pareto}}
+
+有官方实现（GitHub: \href{https://github.com/intel-isl/MultiObjectiveOptimization}{intel-isl/MultiObjectiveOptimization}）。
 
 \section{结果与观感}
 
