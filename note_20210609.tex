@@ -95,12 +95,23 @@
 
 \subsubsection{\citefullauthor{Chen18GradNorm}}
 
-\citet{Chen18GradNorm}提出，任务间的不平衡的表现为反向传播时\emph{梯度的不平衡}，最终影响训练结果。比方说有一个占主导地位的任务，其主导地位表现为反向传播时具有相对其它任务而言较大的梯度。他们通过调整每个任务的损失函数的反向传播梯度的幅度，使多个任务在相似的\emph{速率}下训练。
+\citet{Chen18GradNorm}提出，任务间的不平衡的表现为反向传播时\emph{梯度的不平衡}，最终影响训练结果。比方说有一个占主导地位的任务，其主导地位表现为反向传播时具有相对其它任务而言较大的梯度。他们通过调整每个任务的损失函数的反向传播梯度的大小，使多个任务在相似的\emph{速率}下训练。
 
 这篇文章的目标是找出在某一步训练$t$时，对应某个任务$i$的最佳权值$w_i(t)$，即最终的多重任务loss $L_\mathrm{total}(\cdot)$为：
 \begin{equation}
-    L_\mathrm{total}(W;t) = \sum_i w_i(t) L_i
+    L_\mathrm{total}(W;t) = \sum_i w_i(t) L_i.
 \end{equation}
+
+为了学习$w_i(t)$，需要将不同任务的梯度范数置于同一个量度下，获得其相对的大小；并动态调整这些梯度范数的大小，以便不同的任务以相似的速率训练。下面对一些需要使用的量进行定义：
+\begin{itemize}
+    \item $W$：神经网络中应用GradNorm方法的那部分网络的权值。为了节约计算成本，通常是多重任务网络中的最后一层共享层的权值。
+    \item $G_{W}^{(i)}(t) =\left \| \bigtriangledown_{W}w_{i}(t)L_{i}(t) \right \|_{2}$：选择的权值$W$对应的加权单任务loss\ $w_{i}(t)L_{i}(t)$的梯度的L2范数。
+    \item $\bar{G}_{W}(t)=E_\mathrm{task}[G_{W}^{(i)}(t)]$：在$t$时刻，所有任务的平均梯度范数。
+    \item $\tilde{L}_{i}(t)={L_{i}(t)}/{L_{i}(0)}$：任务$i$在时刻$t$与初始时刻的loss比例，$\tilde{L}_{i}(t)$反比于训练速率，越小则训练越快。 % TODO L(0) 的设置和选择
+    \item $r_{i}(t)=\tilde{L}_{i}(t)/E_\mathrm{task}[\tilde{L}_{i}(t)]$：任务i的相对反比训练速率。
+\end{itemize}
+
+\mapsto 
 
 \subsubsection{\citefullauthor{Sener18Pareto}}
 
@@ -158,6 +169,10 @@ class AutomaticWeightedLoss(nn.Module):
 有很多证据表明这个方法并不那么有效，不过至少提供了个思路。
 
 对于我的任务而言，效果不是很好，只在一个loss取得了不错的效果，其它几个loss有明显的退步。
+
+\subsection{\citefullauthor{Chen18GradNorm}}
+
+\subsection{\citefullauthor{Sener18Pareto}}
 
 \bibliography{ref/note_20210609}
 
