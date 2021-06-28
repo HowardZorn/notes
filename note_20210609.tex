@@ -4,7 +4,7 @@
 \documentclass{ctexart}
 \usepackage{note}
 
-\title{Multi-Task Learning 笔记}
+\title{Multi-Task Learning笔记}
 \author{Fw[a]rd\thanks{这篇文章的内容以GPLv2协议释出}}
 \date{2021年6月9日}
 
@@ -122,7 +122,30 @@ $\bar{G}_{W}(t)$用来衡量在$t$时刻平均梯度范数的大小并由此确�
 \begin{equation}
     L_{grad}(t;w_{i}(t))=\sum_{i}\left \| G_{w}^{(i)}(t)-\bar{G}_{w}(t)*[r_{i}(t)]^{\alpha} \right \|_{1},
 \end{equation}
-其中，在微分$L_{grad}$时，仅仅针对$w_i$，并且$\bar{G}_{w}(t)*[r_{i}(t)]^{\alpha}$被看作为常数。另外，在每次更新$w_i(t)$前，都会重新标准化$w_i(t)$使得$\sum_{i}w_{i}(t)=T$。这使得GradNorm方法对$w_i$的调整与全局学习率的设置解耦。
+其中，在微分$L_{grad}$时，仅仅针对$w_i$，并且$\bar{G}_{w}(t)*[r_{i}(t)]^{\alpha}$被看作为常数。另外，在每次更新$w_i(t)$前，都会重新标准化$w_i(t)$使得$\sum_{i}w_{i}(t)=T$。这使得GradNorm方法对$w_i$的调整与全局学习率的设置解耦\footnote{如果$\sum_{i}w_{i}(t)\neq T$，那么全局学习率的设置就仅仅只有指导意义了。想象一下$\sum_{i}w_{i}(t)$过大和过小对全局学习率的影响。实际上，手动调节每个任务的权值时也需要满足这个要求。}。
+
+完整算法如算法~\ref{alg:gradnorm}~所示。
+
+\begin{algorithm}[htb]
+    \caption{使用GradNorm的训练过程}
+    \label{alg:gradnorm}
+ \begin{algorithmic}
+    \STATE 初始化 $w_i(0)=1$ $\forall i$
+    \STATE 初始化网络权值 $\mathcal{W}$
+    \STATE 选择一个$\alpha> 0$，然后选择需要进行GradNorm的网络权值$W$（通常是多个任务间共享的\\ \hspace{1em} 最后一层）
+    \FOR{$t=0$ {\bfseries $\to$} $max\_train\_steps$}
+    \STATE {\bfseries 输入} batch $x_i$以计算$L_i(t)$ $\forall i$ 和 $L(t) = \sum_i w_i(t)L_i(t)$ {\fangsong [一般前向流程]}
+    \STATE 计算 $G_W^{(i)}(t)$ 和 $r_i(t)$ $\forall i$
+    \STATE 计算 $\overline{G}_W(t)$，通过对 $G_W^{(i)}(t)$ 做平均
+    \STATE 计算 $L_{\text{grad}}= \sum_i\rvert G_W^{(i)}(t) - \overline{G}_W(t)\times [r_i(t)]^{\alpha}\rvert_1$
+    \STATE 计算GradNorm的梯度$\nabla_{w_i} L_{\text{grad}}$，将目标$\overline{G}_W(t)\times [r_i(t)]^{\alpha}$看作常数。
+    \STATE 计算一般的梯度$\nabla_{\mathcal{W}} L(t)$
+    \STATE 更新$w_i(t) \mapsto w_i(t+1)$，使用梯度$\nabla_{w_i} L_{\text{grad}}$
+    \STATE 更新$\mathcal{W}(t) \mapsto \mathcal{W}(t+1)$，使用梯度$\nabla_{\mathcal{W}} L(t)$ {\fangsong [一般反向流程]}
+    \STATE 重新标准化$w_i(t+1)$，使得$\sum_iw_i(t+1) = T$
+    \ENDFOR
+ \end{algorithmic}
+ \end{algorithm} 
 
 \subsubsection{\citefullauthor{Sener18Pareto}}
 
