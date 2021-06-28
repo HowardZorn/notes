@@ -99,6 +99,7 @@
 
 这篇文章的目标是找出在某一步训练$t$时，对应某个任务$i$的最佳权值$w_i(t)$，即最终的多重任务loss $L_\mathrm{total}(\cdot)$为：
 \begin{equation}
+    \label{eq:GradNormTotalLoss}
     L_\mathrm{total}(W;t) = \sum_i w_i(t) L_i.
 \end{equation}
 
@@ -108,10 +109,20 @@
     \item $G_{W}^{(i)}(t) =\left \| \bigtriangledown_{W}w_{i}(t)L_{i}(t) \right \|_{2}$：选择的权值$W$对应的加权单任务loss\ $w_{i}(t)L_{i}(t)$的梯度的L2范数。
     \item $\bar{G}_{W}(t)=E_\mathrm{task}[G_{W}^{(i)}(t)]$：在$t$时刻，所有任务的平均梯度范数。
     \item $\tilde{L}_{i}(t)={L_{i}(t)}/{L_{i}(0)}$：任务$i$在时刻$t$与初始时刻的loss比例，$\tilde{L}_{i}(t)$反比于训练速率，越小则训练越快。 % TODO L(0) 的设置和选择
-    \item $r_{i}(t)=\tilde{L}_{i}(t)/E_\mathrm{task}[\tilde{L}_{i}(t)]$：任务i的相对反比训练速率。
+    \item $r_{i}(t)=\tilde{L}_{i}(t)/E_\mathrm{task}[\tilde{L}_{i}(t)]$：任务$i$的相对反比训练速率。
 \end{itemize}
 
-\mapsto 
+$\bar{G}_{W}(t)$用来衡量在$t$时刻平均梯度范数的大小并由此确定相对梯度大小。$r_{i}(t)$则用来平衡梯度，如果$r_{i}(t)$越大，则任务$i$的梯度大小应该越高以加快任务的训练。因此，任务$i$的梯度范数$G_{W}^{(i)}(t)$的目标是：
+\begin{equation}
+    G_{W}^{(i)}(t) \mapsto \bar{G}_W(t) \times [r_i(t)]^\alpha, 
+\end{equation}
+其中，$\alpha$是设定恢复力强度的超参数，即将任务的训练速度调节到平均水准的强度。如果任务的复杂程度很不一样，导致任务之间的学习速率大不相同，就应该使用较高的$\alpha$来进行较强的训练速率平衡；反之，对于多个相似的任务，应该使用较小的$\alpha$。
+
+既然有了目标梯度范数，那么我们针对式~\ref{eq:GradNormTotalLoss}~中$w_i(t)$的loss函数如下：
+\begin{equation}
+    L_{grad}(t;w_{i}(t))=\sum_{i}\left \| G_{w}^{(i)}(t)-\bar{G}_{w}(t)*[r_{i}(t)]^{\alpha} \right \|_{1},
+\end{equation}
+其中，在微分$L_{grad}$时，仅仅针对$w_i$，并且$\bar{G}_{w}(t)*[r_{i}(t)]^{\alpha}$被看作为常数。另外，在每次更新$w_i(t)$前，都会重新标准化$w_i(t)$使得$\sum_{i}w_{i}(t)=T$。这使得GradNorm方法对$w_i$的调整与全局学习率的设置解耦。
 
 \subsubsection{\citefullauthor{Sener18Pareto}}
 

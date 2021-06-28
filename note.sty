@@ -21,3 +21,12 @@
 \newcommand{。}{\ifmmode\text{．}\else ．\fi}
 % 中文强调用着重号，总之不用楷体……
 \renewcommand{\emph}[1]{\CJKunderdot{#1}}
+% pdf title & author
+\makeatletter
+\AtBeginDocument{
+  \hypersetup{
+    pdftitle = {\@title},
+    pdfauthor = {\@author}
+  }
+}
+\makeatother
