@@ -133,19 +133,19 @@ $\bar{G}_{W}(t)$用来衡量在$t$时刻平均梯度范数的大小并由此确�
     \STATE 初始化 $w_i(0)=1$ $\forall i$
     \STATE 初始化网络权值 $\mathcal{W}$
     \STATE 选择一个$\alpha> 0$，然后选择需要进行GradNorm的网络权值$W$（通常是多个任务间共享的\\ \hspace{1em} 最后一层）
-    \FOR{$t=0$ {\bfseries $\to$} $max\_train\_steps$}
-    \STATE {\bfseries 输入} batch $x_i$以计算$L_i(t)$ $\forall i$ 和 $L(t) = \sum_i w_i(t)L_i(t)$ {\fangsong [一般前向流程]}
+    \FOR{$t=0 \to max\_train\_steps$}
+    \STATE {\bfseries 输入}一批次$x_i$以计算$L_i(t)$ $\forall i$ 和 $L(t) = \sum_i w_i(t)L_i(t)$ {\fangsong [一般前向流程]}
     \STATE 计算 $G_W^{(i)}(t)$ 和 $r_i(t)$ $\forall i$
-    \STATE 计算 $\overline{G}_W(t)$，通过对 $G_W^{(i)}(t)$ 做平均
-    \STATE 计算 $L_{\text{grad}}= \sum_i\rvert G_W^{(i)}(t) - \overline{G}_W(t)\times [r_i(t)]^{\alpha}\rvert_1$
-    \STATE 计算GradNorm的梯度$\nabla_{w_i} L_{\text{grad}}$，将目标$\overline{G}_W(t)\times [r_i(t)]^{\alpha}$看作常数。
+    \STATE 计算 $\bar{G}_W(t)$，通过对 $G_W^{(i)}(t)$ 做平均
+    \STATE 计算 $L_{\text{grad}}= \sum_i\rvert G_W^{(i)}(t) - \bar{G}_W(t)\times [r_i(t)]^{\alpha}\rvert_1$
+    \STATE 计算GradNorm的梯度$\nabla_{w_i} L_{\text{grad}}$，将目标$\bar{G}_W(t)\times [r_i(t)]^{\alpha}$看作常数。
     \STATE 计算一般的梯度$\nabla_{\mathcal{W}} L(t)$
     \STATE 更新$w_i(t) \mapsto w_i(t+1)$，使用梯度$\nabla_{w_i} L_{\text{grad}}$
     \STATE 更新$\mathcal{W}(t) \mapsto \mathcal{W}(t+1)$，使用梯度$\nabla_{\mathcal{W}} L(t)$ {\fangsong [一般反向流程]}
     \STATE 重新标准化$w_i(t+1)$，使得$\sum_iw_i(t+1) = T$
     \ENDFOR
  \end{algorithmic}
- \end{algorithm} 
+ \end{algorithm}
 
 \subsubsection{\citefullauthor{Sener18Pareto}}
 
@@ -157,6 +157,7 @@ $\bar{G}_{W}(t)$用来衡量在$t$时刻平均梯度范数的大小并由此确�
 
 官方实现是一个空的仓库，很有意思……（GitHub: \href{https://github.com/dyz-zju/multitaskvision}{dyz-zju/multitaskvision}，该地址疑为fork过后的）有非官方实现（GitHub: \href{https://github.com/ranandalon/mtl}{ranandalon/mtl}, \href{https://github.com/Mikoto10032/AutomaticWeightedLoss}{Mikoto\-10032/Automatic\-Weighted\-Loss}）。
 
+下面是来自Mikoto\-10032/Automatic\-Weighted\-Loss仓库的核心代码和使用示范：
 \begin{minted}[
     frame=lines,
     linenos
@@ -186,11 +187,20 @@ class AutomaticWeightedLoss(nn.Module):
             loss_sum += 0.5 / (self.params[i] ** 2) * loss + \
                 torch.log(1 + self.params[i] ** 2)
         return loss_sum
+
+# Demo
+from torch import optim
+
+model = Model()
+optimizer = optim.Adam([
+                {'params': model.parameters()},
+                {'params': awl.parameters(), 'weight_decay': 0}
+            ])
 \end{minted}
 
 \subsubsection{\citefullauthor{Chen18GradNorm}}
 
-没有找到官方实现。
+没有找到官方实现。有一些非官方实现（GitHub: \href{https://github.com/brianlan/pytorch-grad-norm}{brianlan/pytorch-grad-norm}（简易版）、\href{https://github.com/brianlan/complex-grad-norm}{brianlan/complex-grad-norm}（复杂版））。
 
 \subsubsection{\citefullauthor{Sener18Pareto}}
 
