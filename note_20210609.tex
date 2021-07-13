@@ -194,13 +194,27 @@ from torch import optim
 model = Model()
 optimizer = optim.Adam([
                 {'params': model.parameters()},
-                {'params': awl.parameters(), 'weight_decay': 0}
+                {'params': awl.parameters(), 'weight_decay': 0} # important!
             ])
+
+for i in range(epoch):
+for data, label1, label2 in data_loader:
+    # forward
+    pred1, pred2 = Model(data)
+    # calculate losses
+    loss1 = loss_1(pred1, label1)
+    loss2 = loss_2(pred2, label2)
+    # weigh losses
+    loss_sum = awl(loss1, loss2)
+    # backward
+    optimizer.zero_grad()
+    loss_sum.backward()
+    optimizer.step()
 \end{minted}
 
 \subsubsection{\citefullauthor{Chen18GradNorm}}
 
-没有找到官方实现。有一些非官方实现（GitHub: \href{https://github.com/brianlan/pytorch-grad-norm}{brianlan/pytorch-grad-norm}（简易版）、\href{https://github.com/brianlan/complex-grad-norm}{brianlan/complex-grad-norm}（复杂版））。
+没有找到官方实现。有一些非官方实现（GitHub: \href{https://github.com/hosseinshn/GradNorm}{hosseinshn/GradNorm}、\href{https://github.com/brianlan/pytorch-grad-norm}{brianlan/pytorch-grad-norm}（简易版）、\href{https://github.com/brianlan/complex-grad-norm}{brianlan/complex-grad-norm}（复杂版））。
 
 下面是本人仿写的代码：
 \begin{minted}[
@@ -281,6 +295,10 @@ class GradNormModel:
 对于我的任务而言，效果不是很好，只在一个loss取得了不错的效果，其它几个loss有明显的退步。
 
 \subsection{\citefullauthor{Chen18GradNorm}}
+
+没有官方实现导致其价值大大降低。不过根据第三方实现，可以参考实现出一份符合原论文的代码。
+
+对于我的任务而言，效果尚可。只在一个loss取得了不错的效果，其它几个loss有一些退步。
 
 \subsection{\citefullauthor{Sener18Pareto}}
 
