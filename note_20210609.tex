@@ -151,6 +151,36 @@ $\bar{G}_{W}(t)$用来衡量在$t$时刻平均梯度范数的大小并由此确�
 
 \citet{Sener18Pareto}提出，多重任务学习本质上是一个多目标优化问题，全局目标是找到一个帕累托最优解（Pareto optimal solution）。他们提出了一个基于梯度的多目标优化算法，并给出了对这个算法的效率优化方案。
 
+这篇文章定义MTL问题为最小化问题，也即：
+\begin{equation}
+    \min_{\substack{\bm\theta^\mathrm{sh},\\ \bm\theta^{1},\ldots ,\bm\theta^{T}}}\quad\sum_{t=1}^{T} c^t\hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh}, \bm\theta^{t}),
+\end{equation}
+其中，$\bm\theta^\mathrm{sh}$是任务共享的网络权值，$\bm\theta^{t}$是任务$t$专属的权值，$c^t$是任务$t$的loss——$\hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh}, \bm\theta^{t})$的权值。
+
+这篇文章希望优化一组可能冲突的目标。\citet{Sener18Pareto}将上式化为多目标优化问题，并使用向量loss值$\mathbf{L}$表示各个任务的loss：
+\begin{equation}
+    \min_{\substack{\bm\theta^\mathrm{sh},\\ \bm\theta^1,\ldots,\bm\theta^T}} \mathbf{L}(\bm\theta^\mathrm{sh}, \bm\theta^1,\ldots,\bm\theta^T) =
+    \min_{\substack{\bm\theta^\mathrm{sh},\\ \bm\theta^1,\ldots,\bm\theta^T}} \big( \hat{\mathcal{L}}^1(\bm\theta^\mathrm{sh},\bm\theta^1), \ldots,  \hat{\mathcal{L}}^T(\bm\theta^\mathrm{sh},\bm\theta^T) \big)^\intercal.
+\end{equation}
+
+这个多目标优化问题的目标是达成帕累托最优。
+
+\begin{definition}[MTL中的帕累托最优] {\ }%
+    \normalfont
+    \begin{enumerate}[topsep=0pt, label=(\alph*),align=left,leftmargin=*]
+    \item 一个解$\bm\theta$优于（dominate）另一个解$\bar{\bm\theta}$，仅当在所有任务$t$中\mbox{$\hat{\mathcal{L}}^t(\bm\theta^{sh},\bm\theta^t)  \leq \hat{\mathcal{L}}^t(\bar{\bm\theta}^{sh},\bar{\bm\theta}^t)$}并且 \\ \mbox{$\mathbf{L}(\bm\theta^{sh}, \bm\theta^1,\ldots,\bm\theta^T) \neq \mathbf{L}(\bar{\bm\theta}^{sh}, \bar{\bm\theta}^1,\ldots,\bar{\bm\theta}^T) $}。
+    \item 一个解$\bm\theta^\star$如果是帕累托最优的（Pareto optimal），仅当不存在一个解$\bm\theta$优于$\bm\theta^\star$。
+    \item 帕累托最优解的集合称为帕累托集$\mathcal{P}_{\bm\theta}$（Pareto set），他们的像\footnote{解集经过目标函数转换过的像集}称为帕累托前沿$\mathcal{P}_{\mathbf{L}}=\{\mathbf{L}(\bm\theta)\}_{\bm\theta\in \mathcal{P}_{\bm\theta}}$（Pareto front）。
+    \end{enumerate}
+\end{definition}
+% 值得注意的有如下几点:
+% 1，现在的学术界通常称之帕累托有效（pareto efficiency）,而非最优（pareto optimal）。因为它的定义仅表示经济中没有浪费，而没有浪费是效率的一种。最优通常要对应某一个目标函数来说，如数学规划问题里才会有最优一说，在这里我们指的是社会福利函数（social welfare function）。给定任意社会福利函数，帕雷托有效的配置集合里只有一点，或某些点是最优的。
+% 2，帕雷托有效是一个容易误导的概念，它只考虑效率，不管公平。一个极端的配置是穷人一无所有，富人为富不仁。这是满足帕雷托有效的定义的，但显然，它是荒谬的。
+% 作者：Luo Bfmmh
+% 链接：https://www.zhihu.com/question/22570835/answer/21853093
+
+在这篇论文中，\citet{Sener18Pareto}专注于基于梯度的多目标优化。下面将介绍其理论算法。
+
 \subsection{实现}
 
 \subsubsection{\citefullauthor{Kendall18Uncertainty}}
