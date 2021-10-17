@@ -58,7 +58,7 @@
     \end{aligned}
 \end{equation}
 
-对式~\ref{eq:output-likelihood}.b~进行缩放，然后对$p(y|f^W(x)) = \mathrm{Softmax}(\frac{1}{\sigma^2} f^W(x))$\footnote{可以认为是\href{https://zh.wikipedia.org/wiki/玻尔兹曼分布}{玻尔兹曼分布}}做对数，可得：
+对式~\ref{eq:output-likelihood}.b~进行缩放，然后对$p(y|f^W(x)) = \mathrm{Softmax}(\frac{1}{\sigma^2} f^W(x))$\footnote{可以认为是\href{https://zh.wikipedia.org/wiki/玻尔兹曼分布}{玻尔兹曼分布}（Boltzmann distribution），或者叫吉布斯分布（Gibbs distribution）。}做对数，可得：
 \begin{equation}
     \log p(y|f^W(x)) \xlongequal{\textrm{第i个元素}} \frac{1}{\sigma^2} f^W_i(x) - \log \sum_e \exp\left( \frac{1}{\sigma^2} f^W_e(x)\right).
 \end{equation}
@@ -170,7 +170,7 @@ $\bar{G}_{W}(t)$用来衡量在$t$时刻平均梯度范数的大小并由此确�
     \begin{enumerate}[topsep=0pt, label=(\alph*),align=left,leftmargin=*]
     \item 一个解$\bm\theta$优于（dominate）另一个解$\bar{\bm\theta}$，仅当在所有任务$t$中\mbox{$\hat{\mathcal{L}}^t(\bm\theta^{sh},\bm\theta^t)  \leq \hat{\mathcal{L}}^t(\bar{\bm\theta}^{sh},\bar{\bm\theta}^t)$}并且 \\ \mbox{$\mathbf{L}(\bm\theta^{sh}, \bm\theta^1,\ldots,\bm\theta^T) \neq \mathbf{L}(\bar{\bm\theta}^{sh}, \bar{\bm\theta}^1,\ldots,\bar{\bm\theta}^T) $}。
     \item 一个解$\bm\theta^\star$如果是帕累托最优的（Pareto optimal），仅当不存在一个解$\bm\theta$优于$\bm\theta^\star$。
-    \item 帕累托最优解的集合称为帕累托集$\mathcal{P}_{\bm\theta}$（Pareto set），他们的像\footnote{解集经过目标函数转换过的像集}称为帕累托前沿$\mathcal{P}_{\mathbf{L}}=\{\mathbf{L}(\bm\theta)\}_{\bm\theta\in \mathcal{P}_{\bm\theta}}$（Pareto front）。
+    \item 帕累托最优解的集合称为帕累托集$\mathcal{P}_{\bm\theta}$（Pareto set），他们的像\footnote{也即解集经过目标函数转换过的像集}称为帕累托前沿$\mathcal{P}_{\mathbf{L}}=\{\mathbf{L}(\bm\theta)\}_{\bm\theta\in \mathcal{P}_{\bm\theta}}$（Pareto front）。
     \end{enumerate}
 \end{definition}
 % 值得注意的有如下几点:
@@ -180,6 +180,14 @@ $\bar{G}_{W}(t)$用来衡量在$t$时刻平均梯度范数的大小并由此确�
 % 链接：https://www.zhihu.com/question/22570835/answer/21853093
 
 在这篇论文中，\citet{Sener18Pareto}专注于基于梯度的多目标优化。下面将介绍其理论算法。
+
+\paragraph{多梯度下降算法（Multiple Gradient Descent Algorithm, MGDA）}和单目标的优化问题一样，多目标优化问题可以采用梯度下降法获得局部最优解。MGDA利用\href{https://zh.wikipedia.org/wiki/%E5%8D%A1%E9%B2%81%E4%BB%80-%E5%BA%93%E6%81%A9-%E5%A1%94%E5%85%8B%E6%9D%A1%E4%BB%B6}{卡鲁什-库恩-塔克条件（KKT条件）}进行优化问题求解，针对任务共享和任务专属权值：
+\begin{enumerate}
+    \item 存在$\alpha^1, \ldots, \alpha^T \geq 0$，使得$\sum^T_{t=1}\alpha^t = 1$并且$\sum^T_{t=1}\alpha^t \nabla_{\bm\theta^\mathrm{sh}} \hat{\mathcal{L}}^t(\bm\theta^{sh},\bm\theta^t) = 0$；
+    \item 对所有任务$t$，$\nabla_{\bm\theta^t} \hat{\mathcal{L}}^t(\bm\theta^{sh},\bm\theta^t) = 0$。
+\end{enumerate}
+
+任何一个满足上述条件的解称作帕累托静态点（Pareto stationary point）。虽然，每个帕累托最优点满足帕累托静态点的要求，但是反之可能不成立。
 
 \subsection{实现}
 
