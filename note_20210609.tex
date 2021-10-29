@@ -130,20 +130,20 @@ $\bar{G}_{W}(t)$用来衡量在$t$时刻平均梯度范数的大小并由此确�
     \caption{使用GradNorm的训练过程}
     \label{alg:gradnorm}
  \begin{algorithmic}
-    \STATE 初始化 $w_i(0)=1$ $\forall i$
-    \STATE 初始化网络权值 $\mathcal{W}$
-    \STATE 选择一个$\alpha> 0$，然后选择需要进行GradNorm的网络权值$W$（通常是多个任务间共享的\\ \hspace{1em} 最后一层）
-    \FOR{$t=0 \to max\_train\_steps$}
-    \STATE {\bfseries 输入}一批次$x_i$以计算$L_i(t)$ $\forall i$ 和 $L(t) = \sum_i w_i(t)L_i(t)$ {\fangsong [一般前向流程]}
-    \STATE 计算 $G_W^{(i)}(t)$ 和 $r_i(t)$ $\forall i$
-    \STATE 计算 $\bar{G}_W(t)$，通过对 $G_W^{(i)}(t)$ 做平均
-    \STATE 计算 $L_{\text{grad}}= \sum_i\rvert G_W^{(i)}(t) - \bar{G}_W(t)\times [r_i(t)]^{\alpha}\rvert_1$
-    \STATE 计算GradNorm的梯度$\nabla_{w_i} L_{\text{grad}}$，将目标$\bar{G}_W(t)\times [r_i(t)]^{\alpha}$看作常数。
-    \STATE 计算一般的梯度$\nabla_{\mathcal{W}} L(t)$
-    \STATE 更新$w_i(t) \mapsto w_i(t+1)$，使用梯度$\nabla_{w_i} L_{\text{grad}}$
-    \STATE 更新$\mathcal{W}(t) \mapsto \mathcal{W}(t+1)$，使用梯度$\nabla_{\mathcal{W}} L(t)$ {\fangsong [一般反向流程]}
-    \STATE 重新标准化$w_i(t+1)$，使得$\sum_iw_i(t+1) = T$
-    \ENDFOR
+    \State 初始化 $w_i(0)=1$ $\forall i$
+    \State 初始化网络权值 $\mathcal{W}$
+    \State 选择一个$\alpha> 0$，然后选择需要进行GradNorm的网络权值$W$（通常是多个任务间共享的\\ \hspace{1em} 最后一层）
+    \For{$t=0 \to max\_train\_steps$}
+    \State {\bfseries 输入}一批次$x_i$以计算$L_i(t)$ $\forall i$ 和 $L(t) = \sum_i w_i(t)L_i(t)$ \Comment{一般前向流程}
+    \State 计算 $G_W^{(i)}(t)$ 和 $r_i(t)$ $\forall i$
+    \State 计算 $\bar{G}_W(t)$，通过对 $G_W^{(i)}(t)$ 做平均
+    \State 计算 $L_{\text{grad}}= \sum_i\rvert G_W^{(i)}(t) - \bar{G}_W(t)\times [r_i(t)]^{\alpha}\rvert_1$
+    \State 计算GradNorm的梯度$\nabla_{w_i} L_{\text{grad}}$，将目标$\bar{G}_W(t)\times [r_i(t)]^{\alpha}$看作常数。
+    \State 计算一般的梯度$\nabla_{\mathcal{W}} L(t)$
+    \State 更新$w_i(t) \mapsto w_i(t+1)$，使用梯度$\nabla_{w_i} L_{\text{grad}}$
+    \State 更新$\mathcal{W}(t) \mapsto \mathcal{W}(t+1)$，使用梯度$\nabla_{\mathcal{W}} L(t)$ \Comment{一般反向流程}
+    \State 重新标准化$w_i(t+1)$，使得$\sum_iw_i(t+1) = T$
+    \EndFor
  \end{algorithmic}
  \end{algorithm}
 
@@ -168,7 +168,7 @@ $\bar{G}_{W}(t)$用来衡量在$t$时刻平均梯度范数的大小并由此确�
 \begin{definition}[MTL中的帕累托最优] {\ }%
     \normalfont
     \begin{enumerate}[topsep=0pt, label=(\alph*),align=left,leftmargin=*]
-    \item 一个解$\bm\theta$优于（dominate）另一个解$\bar{\bm\theta}$，仅当在所有任务$t$中\mbox{$\hat{\mathcal{L}}^t(\bm\theta^{sh},\bm\theta^t)  \leq \hat{\mathcal{L}}^t(\bar{\bm\theta}^{sh},\bar{\bm\theta}^t)$}并且 \\ \mbox{$\mathbf{L}(\bm\theta^{sh}, \bm\theta^1,\ldots,\bm\theta^T) \neq \mathbf{L}(\bar{\bm\theta}^{sh}, \bar{\bm\theta}^1,\ldots,\bar{\bm\theta}^T) $}。
+    \item 一个解$\bm\theta$优于（dominate）另一个解$\bar{\bm\theta}$，仅当在所有任务$t$中\mbox{$\hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh},\bm\theta^t)  \leq \hat{\mathcal{L}}^t(\bar{\bm\theta}^\mathrm{sh},\bar{\bm\theta}^t)$}并且 \\ \mbox{$\mathbf{L}(\bm\theta^\mathrm{sh}, \bm\theta^1,\ldots,\bm\theta^T) \neq \mathbf{L}(\bar{\bm\theta}^\mathrm{sh}, \bar{\bm\theta}^1,\ldots,\bar{\bm\theta}^T) $}。
     \item 一个解$\bm\theta^\star$如果是帕累托最优的（Pareto optimal），仅当不存在一个解$\bm\theta$优于$\bm\theta^\star$。
     \item 帕累托最优解的集合称为帕累托集$\mathcal{P}_{\bm\theta}$（Pareto set），他们的像\footnote{也即解集经过目标函数转换过的像集}称为帕累托前沿$\mathcal{P}_{\mathbf{L}}=\{\mathbf{L}(\bm\theta)\}_{\bm\theta\in \mathcal{P}_{\bm\theta}}$（Pareto front）。
     \end{enumerate}
@@ -178,16 +178,84 @@ $\bar{G}_{W}(t)$用来衡量在$t$时刻平均梯度范数的大小并由此确�
 % 2，帕雷托有效是一个容易误导的概念，它只考虑效率，不管公平。一个极端的配置是穷人一无所有，富人为富不仁。这是满足帕雷托有效的定义的，但显然，它是荒谬的。
 % 作者：Luo Bfmmh
 % 链接：https://www.zhihu.com/question/22570835/answer/21853093
+% 可能卡尔多改进（Kaldor efficiency），也称卡尔多-希克斯效率（Kaldor-Hicks efficiency）是比较好的
 
 在这篇论文中，\citet{Sener18Pareto}专注于基于梯度的多目标优化。下面将介绍其理论算法。
 
-\paragraph{多梯度下降算法（Multiple Gradient Descent Algorithm, MGDA）}和单目标的优化问题一样，多目标优化问题可以采用梯度下降法获得局部最优解。MGDA利用\href{https://zh.wikipedia.org/wiki/%E5%8D%A1%E9%B2%81%E4%BB%80-%E5%BA%93%E6%81%A9-%E5%A1%94%E5%85%8B%E6%9D%A1%E4%BB%B6}{卡鲁什-库恩-塔克条件（KKT条件）}进行优化问题求解，针对任务共享和任务专属权值：
+\paragraph{多梯度下降算法（Multiple Gradient Descent Algorithm, MGDA）}和单目标的优化问题一样，多目标优化问题可以采用梯度下降法获得局部最优解。MGDA\cite{Desideri12MGDA}利用\href{https://zh.wikipedia.org/wiki/%E5%8D%A1%E9%B2%81%E4%BB%80-%E5%BA%93%E6%81%A9-%E5%A1%94%E5%85%8B%E6%9D%A1%E4%BB%B6}{卡鲁什-库恩-塔克条件（KKT条件）}进行优化问题求解，针对任务共享和任务专属权值：
 \begin{enumerate}
-    \item 存在$\alpha^1, \ldots, \alpha^T \geq 0$，使得$\sum^T_{t=1}\alpha^t = 1$并且$\sum^T_{t=1}\alpha^t \nabla_{\bm\theta^\mathrm{sh}} \hat{\mathcal{L}}^t(\bm\theta^{sh},\bm\theta^t) = 0$；
-    \item 对所有任务$t$，$\nabla_{\bm\theta^t} \hat{\mathcal{L}}^t(\bm\theta^{sh},\bm\theta^t) = 0$。
+    \item 存在$\alpha^1, \ldots, \alpha^T \geq 0$，使得$\sum^T_{t=1}\alpha^t = 1$并且$\sum^T_{t=1}\alpha^t \nabla_{\bm\theta^\mathrm{sh}} \hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh},\bm\theta^t) = 0$；
+    \item 对所有任务$t$，$\nabla_{\bm\theta^t} \hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh},\bm\theta^t) = 0$。
 \end{enumerate}
+任何一个满足上述条件的解称作帕累托静态点（Pareto stationary point）。虽然，每个帕累托最优点满足帕累托静态点的要求，但是反之可能不成立。考虑优化问题：
+\begin{equation}
+    \min_{\alpha^1,\ldots,\alpha^T}  \Bigg\{  \bigg\| \sum_{t=1}^T \alpha^t \nabla_{\bm\theta^\mathrm{sh}}  \hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh},\bm\theta^t) \bigg\|_2^2 \bigg |  \sum_{t=1}^T \alpha^t = 1, \alpha^t \geq 0 \quad \forall t \Bigg\}
+    \label{eq:kkt_opt}
+\end{equation}
 
-任何一个满足上述条件的解称作帕累托静态点（Pareto stationary point）。虽然，每个帕累托最优点满足帕累托静态点的要求，但是反之可能不成立。
+\citet{Desideri12MGDA}指出，要么该优化问题的解为$0$且结果点满足KKT条件，要么该解给出了改进所有任务的梯度下降方向。由此得出的MTL算法是先对任务专属权值进行梯度下降，然后求解式（\ref{eq:kkt_opt}），并将解（$\sum_{t=1}^T\alpha^t \nabla_{\bm\theta^\mathrm{sh}}$）作为梯度，应用更新于共享权值。
+
+求解这个优化问题，相当于在输入的梯度向量集合的凸包（convex hull）中寻找一个最小范数点。虽然这个问题在计算几何中研究的非常透彻了，但这里\citet{Sener18Pareto}选择使用凸优化算法，因为式（\ref{eq:kkt_opt}）是个带有线性约束的凸二次规划问题。
+
+我们先只考虑二个任务的情况，优化问题可以简化为：
+$$\min_{\alpha \in [0,1]} \| \alpha \nabla_{\bm\theta^\mathrm{sh}}\hat{\mathcal{L}}^1(\bm\theta^\mathrm{sh},\bm\theta^1)+ (1-\alpha) \nabla_{\bm\theta^\mathrm{sh}}\hat{\mathcal{L}}^2(\bm\theta^\mathrm{sh},\bm\theta^2) \|_2^2,$$
+这是一个关于$\alpha$的一维二次函数，其分析解如下：
+\begin{equation}
+\hat{\alpha}= \max\left(\min\left(\frac{\big(\nabla_{\bm\theta^\mathrm{sh}}\hat{\mathcal{L}}^2(\bm\theta^\mathrm{sh},\bm\theta^2) - \nabla_{\bm\theta^\mathrm{sh}}\hat{\mathcal{L}}^1(\bm\theta^\mathrm{sh},\bm\theta^1)\big)^\intercal  \nabla_{\bm\theta^\mathrm{sh}}\hat{\mathcal{L}}^2(\bm\theta^\mathrm{sh},\bm\theta^2)  }{\|\nabla_{\bm\theta^\mathrm{sh}}\hat{\mathcal{L}}^1(\bm\theta^\mathrm{sh},\bm\theta^1) - \nabla_{\bm\theta^\mathrm{sh}}\hat{\mathcal{L}}^2(\bm\theta^\mathrm{sh},\bm\theta^2)\|_2^2}, 1\right), 0\right)
+\label{eq:two_task_sol}
+\end{equation}
+
+可视化的解法如图~\ref{fig:min_norm2point}所示。虽然这只针对$T=2$的情况，这使得\href{https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm}{Frank-Wolfe算法}\citep{Jaggi2013}的有效应用成为可能，因为线性搜索可以获得解析解。因此，我们用Frank-Wolfe算法去求解一般的约束优化问题，使用式（\ref{eq:two_task_sol}）作为线性搜索的子路径。完整的更新公式如算法~\ref{alg:mtl_mgda}所示。
+
+\begin{tabular}{@{}l@{\hspace{1mm}}r@{}}
+\begin{minipage}{0.68\textwidth}
+%\vspace{-5mm}
+\includegraphics[width=\textwidth]{images/min_norm2point.pdf}
+\label{fig:min_norm2point}
+\captionof{figure}{在两点的凸包内寻找最小范数点(\mbox{$\min_{\gamma \in [0,1]} \| \gamma \bm\theta + (1-\gamma) \bar{\bm\theta} \|_2^2$})的可视化。如图所示，解要么出现在边缘，要么解向量垂直于$\bm\theta - \bar{\bm\theta}$。}
+\end{minipage}
+&\begin{minipage}{0.30\textwidth}
+\vspace{-5mm}
+\begin{algorithm}[H]\captionsetup{labelsep=newline}
+\caption{ $\min_{\gamma \in [0,1]} \| \gamma \bm\theta + (1-\gamma) \bar{\bm\theta} \|_2^2$}
+\label{alg:TWO_PNT}
+\begin{algorithmic}[1]
+\If{$\bm\theta^\intercal \bar{\bm\theta} \geq \bm\theta^\intercal \bm\theta$}
+\State $\gamma = 1$
+\ElsIf{$\bm\theta^\intercal \bar{\bm\theta} \geq \bar{\bm\theta}^\intercal \bar{\bm\theta}$}
+\State $\gamma = 0$
+\Else
+\State $\gamma = \frac{(\bar{\bm\theta}- \bm\theta)^\intercal \bar{\bm\theta}}{\|\bm\theta - \bar{\bm\theta}\|_2^2}$
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+\end{minipage}
+\end{tabular}
+
+\begin{algorithm}[H]
+\caption{MTL更新算法}
+\label{alg:mtl_mgda}
+\begin{algorithmic}[1]
+\For{$t=1$ {\bfseries to} $T$}
+\State $\bm\theta^t = \bm\theta^t - \eta \nabla_{\bm\theta^{t}}  \hat{\mathcal{L}}^t(\bm\theta^{sh},\bm\theta^t)$  \Comment{在任务专属权值上进行梯度下降}
+\EndFor
+\State $\alpha^1,\ldots,\alpha^{T}$ = \textproc{FrankWolfeSolver}($\bm\theta$) \Comment{求解式（\ref{eq:kkt_opt}），得到一个共同的下降方向}
+\State $\bm\theta^{sh} = \bm\theta^{sh} -   \eta \sum_{t=1}^T \alpha^t \nabla_{\bm\theta^{sh}}  \hat{\mathcal{L}}^t(\bm\theta^{sh},\bm\theta^t)$ \Comment{在任务共享权值上进行梯度下降}
+\Statex
+\Procedure{FrankWolfeSolver}{$\bm\theta$}
+\State Initialize $\bm{\alpha} = (\alpha^1, \ldots, \alpha^{T}) = (\frac{1}{T}, \ldots, \frac{1}{T})$
+\State Precompute $\mathbf{M}$ st. $\mathbf{M}_{i,j} = \big(\nabla_{\bm\theta^{sh}}  \hat{\mathcal{L}}^i(\bm\theta^{sh},\bm\theta^i)\big)^\intercal \big(\nabla_{\bm\theta^{sh}}  \hat{\mathcal{L}}^j(\bm\theta^{sh},\bm\theta^j)\big)$
+\Repeat
+\State $\hat{t} = \mathrm{argmin}_r \sum_t \alpha^t \mathbf{M}_{rt}$
+\State $\hat{\gamma} = \mathrm{argmin}_{\gamma}  \big( (1 - \gamma) \bm{\alpha} + \gamma \bm{e}_{\hat{t}}  \big)^\intercal \mathbf{M}  \big( (1 - \gamma) \bm{\alpha} + \gamma \bm{e}_{\hat{t}}  \big)$ \Comment{使用算法~\ref{alg:TWO_PNT}求解}
+\State $\bm{\alpha} = (1- \hat{\gamma})\bm{\alpha} + \hat{\gamma} \bm{e}_{\hat{t}}$
+\Until{$\hat{\gamma} \sim 0$ {\bfseries or} Number of Iterations Limit}
+\State {\bfseries return} $\alpha^1,\ldots,\alpha^{T}$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+
 
 \subsection{实现}
 

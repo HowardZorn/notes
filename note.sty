@@ -11,11 +11,15 @@
 \usepackage[margin={1in,1.25in}]{geometry} % See geometry.pdf to learn the layout options. There are lots.
 \geometry{a4paper} % or letterpaper (US) or a5paper or....
 %\usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
-\usepackage{graphicx} % support the \includegraphics command and options
-\usepackage{hyperref} % support the \href command
+\usepackage{graphicx} % to support the \includegraphics command and options
+\usepackage{hyperref} % to support the \href command
 \usepackage{minted} % to support the code showing
 \usepackage{enumitem} % enumerate
- % bibliography
+\usepackage{capt-of} % to support the \captionof command
+% support caption commands
+\usepackage{caption}
+\usepackage{subcaption}
+% bibliography
 \usepackage[numbers,super,square]{natbib}
 \bibliographystyle{unsrtnat}
 
@@ -40,7 +44,7 @@
 \makeatother
 % algorithm
 \usepackage{algorithm}
-\usepackage{algorithmic}
+\usepackage{algorithmicx,algpseudocode}
 \floatname{algorithm}{算法}
 % definition
 \newtheorem{definition}{定义}
