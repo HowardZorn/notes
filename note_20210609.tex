@@ -211,10 +211,11 @@ $$\min_{\alpha \in [0,1]} \| \alpha \nabla_{\bm\theta^\mathrm{sh}}\hat{\mathcal{
 \begin{minipage}{0.68\textwidth}
 %\vspace{-5mm}
 \includegraphics[width=\textwidth]{images/min_norm2point.pdf}
-\label{fig:min_norm2point}
 \captionof{figure}{在两点的凸包内寻找最小范数点(\mbox{$\min_{\gamma \in [0,1]} \| \gamma \bm\theta + (1-\gamma) \bar{\bm\theta} \|_2^2$})的可视化。如图所示，解要么出现在边缘，要么解向量垂直于$\bm\theta - \bar{\bm\theta}$。}
+\label{fig:min_norm2point}
 \end{minipage}
 &\begin{minipage}{0.30\textwidth}
+\linespread{1.1}
 \vspace{-5mm}
 \begin{algorithm}[H]\captionsetup{labelsep=newline}
 \caption{ $\min_{\gamma \in [0,1]} \| \gamma \bm\theta + (1-\gamma) \bar{\bm\theta} \|_2^2$}
@@ -237,14 +238,14 @@ $$\min_{\alpha \in [0,1]} \| \alpha \nabla_{\bm\theta^\mathrm{sh}}\hat{\mathcal{
 \label{alg:mtl_mgda}
 \begin{algorithmic}[1]
 \For{$t=1$ {\bfseries to} $T$}
-\State $\bm\theta^t = \bm\theta^t - \eta \nabla_{\bm\theta^{t}}  \hat{\mathcal{L}}^t(\bm\theta^{sh},\bm\theta^t)$  \Comment{在任务专属权值上进行梯度下降}
+\State $\bm\theta^t = \bm\theta^t - \eta \nabla_{\bm\theta^{t}}  \hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh},\bm\theta^t)$  \Comment{在任务专属权值上进行梯度下降}
 \EndFor
 \State $\alpha^1,\ldots,\alpha^{T}$ = \textproc{FrankWolfeSolver}($\bm\theta$) \Comment{求解式（\ref{eq:kkt_opt}），得到一个共同的下降方向}
-\State $\bm\theta^{sh} = \bm\theta^{sh} -   \eta \sum_{t=1}^T \alpha^t \nabla_{\bm\theta^{sh}}  \hat{\mathcal{L}}^t(\bm\theta^{sh},\bm\theta^t)$ \Comment{在任务共享权值上进行梯度下降}
+\State $\bm\theta^\mathrm{sh} = \bm\theta^\mathrm{sh} -   \eta \sum_{t=1}^T \alpha^t \nabla_{\bm\theta^\mathrm{sh}}  \hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh},\bm\theta^t)$ \Comment{在任务共享权值上进行梯度下降}
 \Statex
 \Procedure{FrankWolfeSolver}{$\bm\theta$}
 \State Initialize $\bm{\alpha} = (\alpha^1, \ldots, \alpha^{T}) = (\frac{1}{T}, \ldots, \frac{1}{T})$
-\State Precompute $\mathbf{M}$ st. $\mathbf{M}_{i,j} = \big(\nabla_{\bm\theta^{sh}}  \hat{\mathcal{L}}^i(\bm\theta^{sh},\bm\theta^i)\big)^\intercal \big(\nabla_{\bm\theta^{sh}}  \hat{\mathcal{L}}^j(\bm\theta^{sh},\bm\theta^j)\big)$
+\State Precompute $\mathbf{M}$ st. $\mathbf{M}_{i,j} = \big(\nabla_{\bm\theta^\mathrm{sh}}  \hat{\mathcal{L}}^i(\bm\theta^\mathrm{sh},\bm\theta^i)\big)^\intercal \big(\nabla_{\bm\theta^\mathrm{sh}}  \hat{\mathcal{L}}^j(\bm\theta^\mathrm{sh},\bm\theta^j)\big)$
 \Repeat
 \State $\hat{t} = \mathrm{argmin}_r \sum_t \alpha^t \mathbf{M}_{rt}$
 \State $\hat{\gamma} = \mathrm{argmin}_{\gamma}  \big( (1 - \gamma) \bm{\alpha} + \gamma \bm{e}_{\hat{t}}  \big)^\intercal \mathbf{M}  \big( (1 - \gamma) \bm{\alpha} + \gamma \bm{e}_{\hat{t}}  \big)$ \Comment{使用算法~\ref{alg:TWO_PNT}求解}
@@ -255,7 +256,23 @@ $$\min_{\alpha \in [0,1]} \| \alpha \nabla_{\bm\theta^\mathrm{sh}}\hat{\mathcal{
 \end{algorithmic}
 \end{algorithm}
 
+到这里，其实已经有一个非常可用的MTL算法了。但是\citet{Sener18Pareto}还是不太满意，他们对一个encoder-decoder模型提出了一个有效率的算法。算法~\ref{alg:mtl_mgda}需要计算每个任务$t$的$\nabla_{\bm\theta^\mathrm{sh}}  \hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh},\bm\theta^t)$，这样需要在共享权值上对每个任务进行一次反向传播流程。因此，所得梯度的计算过程就是一次前向传播流程和随之而来的$T$次反向传播流程。考虑到反向传播的代价一般比前向传播高，算法~\ref{alg:mtl_mgda}的时间复杂度是$O(T)$。
 
+\citet{Sener18Pareto}又提出了一个优化了式~\ref{eq:kkt_opt}的目标的上界的算法，并且只需要一次反向传播。算法将一个共享表示函数和任务专属的决策函数结合为复合函数，作为假设类的建模和约束：
+\begin{equation}
+    f^t(\mathbf{x};\bm\theta^\mathrm{sh},\bm\theta^t) = (f^t(\cdot; \bm\theta^t) \circ g(\cdot; \bm\theta^\mathrm{sh})) (\mathbf{x})  = f^t( g(\mathbf{x}; \bm\theta^\mathrm{sh}); \bm\theta^t),
+\end{equation}
+其中$g$共享表示函数，$f^t$是将共享表示作为输入的任务专属函数。如果我们将共享表示写成$\mathbf{Z} = \left(\mathbf{z}_1,\ldots , \mathbf{z}_N\right)$，其中$\mathbf{z}_i = g(\mathbf{z}_i;\bm\theta^\mathrm{sh})$，那么我们可以定义目标的上界为链式法则的结果：
+\begin{equation}
+    \Bigg\| \sum_{t=1}^T \alpha^t \nabla_{\bm\theta^\mathrm{sh}}  \hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh},\bm\theta^t) \Bigg\|_2^2  \leq    \Bigg\|\frac{\partial \mathbf{Z}}{\partial \bm\theta^\mathrm{sh}}\Bigg\|_2^2 \Bigg\| \sum_{t=1}^T \alpha^t  \nabla_{\mathbf{Z}}  \hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh},\bm\theta^t) \Bigg\|_2^2,
+\end{equation}
+其中，$\left\|\frac{\partial \mathbf{Z}}{\partial \bm\theta^\mathrm{sh}}\right\|_2$是$\mathbf{Z}$关于$\bm\theta^\mathrm{sh}$的Jacobian矩阵的范数。对于这个上界有两个良好性质：(1) 可以在一次反向传播中计算所有任务的$\nabla_{\mathbf{Z}} \hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh},\bm\theta^t)$，(2) $\left\|\frac{\partial \mathbf{Z}}{\partial \bm\theta^\mathrm{sh}}\right\|_2^2 $不是关于$\alpha^1,\ldots ,\alpha^T$的函数，因此这一项作为优化的目标可以被移除，得：
+\begin{equation}
+\min_{\alpha^1,\ldots,\alpha^T}  \Bigg\{  \bigg\| \sum_{t=1}^T \alpha^t  \nabla_{\mathbf{Z}}  \hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh},\bm\theta^t) \bigg\|_2^2 \bigg |  \sum_{t=1}^T \alpha^t = 1, \alpha^t \geq 0 \quad \forall t \Bigg\}
+\label{eq:approx}
+\end{equation}
+
+这个问题被称为MGDA-UB（Multiple Gradient Descent Algorithm -- Upper Bound），总之他将每个任务关于共享权值$\bm\theta^\mathrm{sh}$的梯度改换成了关于共享表示$\mathbf{Z}$的梯度，并运用改进后的算法~\ref{alg:mtl_mgda}对参数进行更新。然后作者证明，这个问题的解也满足\citet{Desideri12MGDA}的结论，即要么该优化问题的解为$0$且结果点是帕累托静态点并满足KKT条件，要么该解给出了改进所有任务的梯度下降方向。只要$\frac{\partial\mathbf{Z}}{\partial\bm\theta^\mathrm{sh}}$是满秩的，那么这个上界便成立。
 
 \subsection{实现}
 
