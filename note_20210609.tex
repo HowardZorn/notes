@@ -205,7 +205,7 @@ $$\min_{\alpha \in [0,1]} \| \alpha \nabla_{\bm\theta^\mathrm{sh}}\hat{\mathcal{
 \label{eq:two_task_sol}
 \end{equation}
 
-可视化的解法如图~\ref{fig:min_norm2point}所示。虽然这只针对$T=2$的情况，这使得\href{https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm}{Frank-Wolfe算法}\citep{Jaggi2013}的有效应用成为可能，因为线性搜索可以获得解析解。因此，我们用Frank-Wolfe算法去求解一般的约束优化问题，使用式（\ref{eq:two_task_sol}）作为线性搜索的子路径。完整的更新公式如算法~\ref{alg:mtl_mgda}所示。
+可视化的解法如图~\ref{fig:min_norm2point}所示。虽然这只针对$T=2$的情况，这使得\href{https://en.wikipedia.org/wiki/Frank%E2%80%93Wolfe_algorithm}{Frank-Wolfe算法}\citep{Jaggi13RevisitingFrank-Wolfe}的有效应用成为可能，因为线性搜索可以获得解析解。因此，我们用Frank-Wolfe算法去求解一般的约束优化问题，使用式（\ref{eq:two_task_sol}）作为线性搜索的子路径。完整的更新公式如算法~\ref{alg:mtl_mgda}所示。
 
 \begin{tabular}{@{}l@{\hspace{1mm}}r@{}}
 \begin{minipage}{0.68\textwidth}
