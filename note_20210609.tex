@@ -262,7 +262,7 @@ $$\min_{\alpha \in [0,1]} \| \alpha \nabla_{\bm\theta^\mathrm{sh}}\hat{\mathcal{
 \begin{equation}
     f^t(\mathbf{x};\bm\theta^\mathrm{sh},\bm\theta^t) = (f^t(\cdot; \bm\theta^t) \circ g(\cdot; \bm\theta^\mathrm{sh})) (\mathbf{x})  = f^t( g(\mathbf{x}; \bm\theta^\mathrm{sh}); \bm\theta^t),
 \end{equation}
-其中$g$共享表示函数，$f^t$是将共享表示作为输入的任务专属函数。如果我们将共享表示写成$\mathbf{Z} = \left(\mathbf{z}_1,\ldots , \mathbf{z}_N\right)$，其中$\mathbf{z}_i = g(\mathbf{z}_i;\bm\theta^\mathrm{sh})$，那么我们可以定义目标的上界为链式法则的结果：
+其中$g$为共享表示函数，$f^t$是将共享表示作为输入的任务专属函数。如果我们将共享表示写成$\mathbf{Z} = \left(\mathbf{z}_1,\ldots , \mathbf{z}_N\right)$，其中$\mathbf{z}_i = g(\mathbf{z}_i;\bm\theta^\mathrm{sh})$，那么我们可以定义目标的上界为链式法则的结果：
 \begin{equation}
     \Bigg\| \sum_{t=1}^T \alpha^t \nabla_{\bm\theta^\mathrm{sh}}  \hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh},\bm\theta^t) \Bigg\|_2^2  \leq    \Bigg\|\frac{\partial \mathbf{Z}}{\partial \bm\theta^\mathrm{sh}}\Bigg\|_2^2 \Bigg\| \sum_{t=1}^T \alpha^t  \nabla_{\mathbf{Z}}  \hat{\mathcal{L}}^t(\bm\theta^\mathrm{sh},\bm\theta^t) \Bigg\|_2^2,
 \end{equation}

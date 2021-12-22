@@ -1,10 +1,11 @@
 % math
+\defaultfontfeatures{Mapping=tex-text} % to support TeX conventions like ``---''
 \usepackage{amsmath, amssymb, amsfonts}
 \usepackage{bm} % bold math
 \usepackage{xspace}
 \usepackage{extarrows}
+\usepackage{multirow}  % tabular
 \usepackage{nicefrac}  % 分数更好看
-\defaultfontfeatures{Mapping=tex-text} % to support TeX conventions like ``---''
 \usepackage{xunicode} % Unicode support for LaTeX character names (accents, European chars, etc)
 \usepackage{booktabs} % professional-quality tables
 \usepackage{xltxtra} % Extra customizations for XeLaTeX\usepackage{geometry} % See geometry.pdf to learn the layout options. There are lots.
@@ -22,6 +23,9 @@
 % bibliography
 \usepackage[numbers,super,square]{natbib}
 \bibliographystyle{unsrtnat}
+
+% ploting
+\usepackage{tikz}
 
 % 中文句号改为句点
 \catcode`\。=\active
@@ -44,7 +48,7 @@
 \makeatother
 % algorithm
 \usepackage{algorithm}
-\usepackage{algorithmicx,algpseudocode}
+\usepackage{algorithmicx,algpseudocodex}
 \floatname{algorithm}{算法}
 % definition
 \newtheorem{definition}{定义}
