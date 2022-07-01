@@ -393,7 +393,7 @@ class GradNormLoss(nn.Module):
         self.w.grad = torch.autograd.grad(grad_loss, self.w)[0]
         optimizer.step()
 
-        self.GW_ti, self.bar_GW_t, self.tilde_L_t, 
+        self.GW_ti, self.bar_GW_t, self.tilde_L_t, \
             self.r_t, self.L_t, self.wL_t = None, None, None, None, None, None
         # re-norm
         self.w.data = self.w.data / self.w.data.sum() * self.num_of_task
